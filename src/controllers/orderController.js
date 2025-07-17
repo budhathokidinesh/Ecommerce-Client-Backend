@@ -25,7 +25,7 @@ export const orderController = async (req, res) => {
       if (!product) {
         return res.status(404).json({
           success: false,
-          message: `Food item not found: ${item.foodId}`,
+          message: `Food item not found: ${item.productId}`,
         });
       }
       stripeLineItems.push({
