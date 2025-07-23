@@ -96,73 +96,67 @@ export const getAllProductsController = async (req, res, next) => {
 };
 export const getAllFilterProductsController = async (req, res, next) => {
   try {
-    const { productPath, maxPrice, minPrice, colors, sale, brand } = req.query;
+    const {
+      mainCategory,
+      maxPrice,
+      minPrice,
+      colors,
+      sale,
+      brand,
+      productPath,
+    } = req.query;
 
     const filter = {};
 
     // This is for productPath filtering
-    if (productPath) {
-      const path = productPath?.startsWith("/")
-        ? productPath
-        : `/${productPath}`;
-      filter.productPath = {
-        $regex: new RegExp(`^${path}`),
-        $options: "i",
-      };
+    if (mainCategory) {
+      filter.mainCategory = mainCategory.includes(",")
+        ? { $in: mainCategory.split(",") }
+        : mainCategory;
     }
 
     // THis is for price range filtering
-    if (minPrice !== undefined && maxPrice !== undefined) {
-      const min = Number(minPrice);
-      const max = Number(maxPrice);
-      if (!isNaN(min) && !isNaN(max) && min <= max) {
-        filter.price = { $gte: min, $lte: max };
-      }
+    if (minPrice && maxPrice) {
+      filter.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
     }
 
     // This is for colors filtering
     if (colors) {
-      const colorArray = Array.isArray(colors)
-        ? colors
-        : colors.includes(",")
-        ? colors.split(",")
-        : [colors];
+      const colorArray = colors.includes(",") ? colors.split(",") : [colors];
       filter.colors = { $in: colorArray };
     }
 
     // This is for brand filtering
     if (brand) {
-      const brandArray = Array.isArray(brand)
-        ? brand
-        : brand.includes(",")
-        ? brand.split(",")
-        : [brand];
-      filter.brand = { $in: brandArray };
+      filter.brand = brand.includes(",") ? { $in: brand.split(",") } : brand;
     }
 
     // This is for sale filtering based on discountPrice
     if (sale === "true") {
-      filter.discountPrice = { $exists: true, $ne: null };
+      filter.sale = true;
+    }
+    if (productPath) {
+      filter.productPath = {
+        $regex: new RegExp(`^${productPath}`),
+        $options: "i",
+      };
     }
 
     const products = await getAllProductsByPath(filter);
-    console.log("FILTERED PRODUCTS:", products?.length);
 
-    if (products?.length > 0) {
-      return responseClient({
-        message: "Filtered products",
-        res,
-        req,
-        payload: products,
-      });
-    } else {
-      return responseClient({
-        message: "No products found",
-        res,
-        req,
-        payload: [],
-      });
-    }
+    products?.length > 0 && Array.isArray(products)
+      ? responseClient({
+          payload: products,
+          message: "Filtered products",
+          req,
+          res,
+        })
+      : responseClient({
+          message: "No product Found",
+          req,
+          res,
+          payload: [],
+        });
   } catch (error) {
     next(error);
   }
