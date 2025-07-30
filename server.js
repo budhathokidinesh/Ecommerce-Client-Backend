@@ -12,6 +12,7 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -24,12 +25,14 @@ import productRouter from "./src/routes/productRoutes.js";
 import categoryRouter from "./src/routes/categoryRoutes.js";
 import orderRouter from "./src/routes/orderRoutes.js";
 import webhookRoute from "./src/routes/webhookRoute.js";
+import stripeRouter from "./src/routes/stripe.js";
 
 //API endpoints
+app.use("/api/v1/stripe/webhook", webhookRoute);
 
 //for webhook
 app.use((req, res, next) => {
-  if (req.originalUrl === "/api/v1/webhook") {
+  if (req.originalUrl.startsWith("/api/v1/webhook")) {
     next(); // skip express.json() for webhook
   } else {
     express.json()(req, res, next);
@@ -40,8 +43,8 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/order", orderRouter);
-app.use("/api/v1/webhook", webhookRoute);
-app.use(express.json());
+app.use("/api/v1/payment", stripeRouter);
+// app.use(express.json());
 
 //end poins for image
 app.use("/api/v1/all", imageRoutes);

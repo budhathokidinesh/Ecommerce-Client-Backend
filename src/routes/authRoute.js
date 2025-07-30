@@ -13,7 +13,10 @@ import {
   newUserDataValidation,
   userActivationDataValidation,
 } from "../middleware/validations/authDataValidation.js";
-import { userAuthMiddleware } from "../middleware/authMiddleware.js";
+import {
+  userAuthMiddleware,
+  renewAccessJWTMiddleware,
+} from "../middleware/authMiddleware.js";
 const router = express.Router();
 router.post("/register", newUserDataValidation, insertNewUser);
 router.post("/activate-user", userActivationDataValidation, activateUser);
@@ -22,5 +25,6 @@ router.get("/user-info", userAuthMiddleware, getUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/logout", userAuthMiddleware, logoutUser);
+router.get("/renew", renewAccessJWTMiddleware);
 
 export default router;

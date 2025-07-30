@@ -3,7 +3,7 @@ const OrderSchema = new mongoose.Schema(
   {
     items: [
       {
-        product: {
+        productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema(
     },
     payment: {
       method: { type: String, default: "Card" },
-      transitionId: {
+      transactionId: {
         type: String,
       },
       status: {
@@ -36,14 +36,35 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       required: false,
     },
-    guestId: {
-      type: String,
-      required: false,
+    isGuest: {
+      type: Boolean,
+      default: false,
     },
     guestInfo: {
-      name: { type: String },
-      email: { type: String },
-      phone: { type: String },
+      guestId: {
+        type: String,
+      },
+      email: {
+        type: String,
+        match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
+        required: function () {
+          return this.isGuest;
+        },
+      },
+      firstName: {
+        type: String,
+      },
+      lastName: {
+        type: String,
+      },
+      phoneNumber: { type: String },
+    },
+    shippingAddresses: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
     },
     orderStatus: {
       type: String,
@@ -54,6 +75,7 @@ const OrderSchema = new mongoose.Schema(
         "On The Way",
         "Delivered",
       ],
+      default: "Order Placed",
     },
   },
   {

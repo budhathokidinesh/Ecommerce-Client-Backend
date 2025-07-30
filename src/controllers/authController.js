@@ -65,7 +65,7 @@ export const insertNewUser = async (req, res, next) => {
 };
 export const activateUser = async (req, res, next) => {
   try {
-    const { sessionId, t } = req.body;
+    const { sessionId, token: t } = req.body;
     const session = await deleteSession({
       _id: sessionId,
       token: t,
@@ -94,34 +94,77 @@ export const activateUser = async (req, res, next) => {
 };
 
 // Login User
+// export const loginUser = async (req, res, next) => {
+//   try {
+//     //Destructure email and password from req.body
+//     const { email, password } = req.body;
+
+//     //Get user by email
+//     const user = await getUserByEmail(email);
+//     if (user?._id) {
+//       //Compare the password
+//       const isPassMatch = comparePassword(password, user.password);
+//       if (isPassMatch) {
+//         console.log("User authenticated succesfully...!");
+
+//         // Create JWTs, so that server can validate through these tokens, instead of asking for username and password
+//         const jwts = await getJwts(email);
+//         // Response jwts
+//         return responseClient({
+//           req,
+//           res,
+//           message: "Login successful...!",
+//           payload: jwts,
+//         });
+//       }
+//     }
+//     const message = " Invalid Login details !!";
+//     const statusCode = 401;
+//     responseClient({ req, res, message, statusCode });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const loginUser = async (req, res, next) => {
   try {
-    //Destructure email and password from req.body
+    //destructure user data
     const { email, password } = req.body;
 
-    //Get user by email
+    //check if user exists
     const user = await getUserByEmail(email);
-    if (user?._id) {
-      //Compare the password
-      const isPassMatch = comparePassword(password, user.password);
-      if (isPassMatch) {
-        console.log("User authenticated succesfully...!");
 
-        // Create JWTs, so that server can validate through these tokens, instead of asking for username and password
-        const jwts = await getJwts(email);
-        // Response jwts
-        return responseClient({
-          req,
-          res,
-          message: "Login successful...!",
-          payload: jwts,
-        });
-      }
+    //if user not found
+    if (!user || !user._id) {
+      return responseClient({
+        req,
+        res,
+        message: "User not found. Please register to login!",
+        statusCode: 404,
+      });
     }
-    const message = " Invalid Login details !!";
-    const statusCode = 401;
-    responseClient({ req, res, message, statusCode });
+
+    //check if password is correct
+    const isMatch = comparePassword(password, user.password);
+
+    if (isMatch) {
+      const jwt = await getJwts(user.email);
+      return responseClient({
+        req,
+        res,
+        message: "User logged in successfully!!",
+        payload: jwt,
+      });
+    }
+
+    return responseClient({
+      req,
+      res,
+      message: "Invalid credentials",
+      statusCode: 401,
+    });
   } catch (error) {
+    console.log("Login error:", error);
+    // Forward error to Express error-handling middleware
     next(error);
   }
 };

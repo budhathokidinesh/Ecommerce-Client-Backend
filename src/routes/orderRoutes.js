@@ -1,8 +1,9 @@
 import express from "express";
-import { orderController } from "../controllers/orderController.js";
+import { fetchOrderHistory } from "../controllers/orderController.js";
+import { userAuthMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 //this is for creating the order
-router.post("/placeOrder", orderController);
+router.get("/history", userAuthMiddleware, fetchOrderHistory);
 
 export default router;

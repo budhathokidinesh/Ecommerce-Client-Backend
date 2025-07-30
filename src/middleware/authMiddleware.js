@@ -8,64 +8,83 @@ import {
 import { responseClient } from "./responseClient.js";
 
 export const userAuthMiddleware = async (req, res, next) => {
-  const { authorization } = req.headers; //Getting authorization from headers.
+  const { authorization } = req.headers;
   let message = "Unauthorized";
-  // Get accessJWT from headers.
-  if (authorization) {
-    const token = authorization.split(" ")[1];
 
-    //Check if accessJWT is valid.
-    const decoded = await verifyAccessJWT(token);
-    console.log(decoded);
-    if (decoded.email) {
-      // Check if exists in session collection(Table).
-      const tokenSession = await getSession({ token });
-      if (tokenSession?._id) {
-        // If exists, get user by email.
-        const user = await getUserByEmail(decoded.email);
-        if (user?._id && user.status === "active") {
-          //Return the user.
-          req.userInfo = user;
-          return next();
+  try {
+    console.log("🟡 Entered userAuthMiddleware");
+
+    if (authorization) {
+      const token = authorization.startsWith("Bearer ")
+        ? authorization.split(" ")[1]
+        : authorization;
+      console.log("🔑 Incoming token:", token);
+
+      const decoded = await verifyAccessJWT(token);
+      console.log("Decoded JWT:", decoded);
+
+      if (decoded.email) {
+        const tokenSession = await getSession({ token });
+        console.log("Session in DB:", tokenSession);
+
+        if (tokenSession?._id) {
+          const user = await getUserByEmail(decoded.email);
+          console.log("Fetched user:", user?.email);
+          console.log("User status:", user?.status);
+
+          if (user?._id && user.status === "active") {
+            req.userInfo = user;
+            console.log("✅ Auth Passed, calling next()");
+            return next();
+          } else {
+            console.log("❌ User not active or not found");
+          }
+        } else {
+          console.log("❌ No session found in DB");
         }
+      } else {
+        console.log("❌ No email in decoded token");
       }
+
+      message = decoded === "jwt expired" ? decoded : "Unauthorized";
+    } else {
+      console.log("❌ No Authorization header");
     }
-    message = decoded === "jwt expired" ? decoded : "Unauthorized";
-    console.log(decoded);
+  } catch (err) {
+    console.error("🔥 Middleware error:", err);
+    message = "Server error";
   }
-  //   const message = decoded === "jwt expired" ? decoded : "Unauthorized access";
+
+  console.log("🚨 Sending 401 from middleware");
   responseClient({ req, res, message, statusCode: 401 });
 };
 
 export const renewAccessJWTMiddleware = async (req, res) => {
-  const { authorization } = req.headers; //Getting authorization from headers.
+  const { authorization } = req.headers;
   let message = "Unauthorized";
-  // Get accessJWT from headers.
+
   if (authorization) {
-    const token = authorization.split(" ")[1];
+    const token = authorization.startsWith("Bearer ")
+      ? authorization.split(" ")[1]
+      : authorization;
 
-    //Check if accessJWT is valid.
     const decoded = await verifyRefreshJWT(token);
-
     if (decoded.email) {
-      // Check if exists in session collection(Table).
       const user = await getOneUser({
         email: decoded.email,
         refreshJWT: token,
       });
       if (user?._id) {
-        // Create new accessJWT
-        const token = await createAccessJWT(decoded.email);
-        //Return accessJWT
+        const newToken = await createAccessJWT(decoded.email);
         return responseClient({
           req,
           res,
           message: "Here is the accessJWT",
-          payload: token,
+          payload: newToken,
         });
       }
     }
   }
-  //   const message = decoded === "jwt expired" ? decoded : "Unauthorized access";
+
   responseClient({ req, res, message, statusCode: 401 });
 };
