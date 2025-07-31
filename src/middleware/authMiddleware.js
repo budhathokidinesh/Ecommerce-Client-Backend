@@ -12,50 +12,32 @@ export const userAuthMiddleware = async (req, res, next) => {
   let message = "Unauthorized";
 
   try {
-    console.log("🟡 Entered userAuthMiddleware");
-
     if (authorization) {
       const token = authorization.startsWith("Bearer ")
         ? authorization.split(" ")[1]
         : authorization;
-      console.log("🔑 Incoming token:", token);
 
       const decoded = await verifyAccessJWT(token);
-      console.log("Decoded JWT:", decoded);
 
       if (decoded.email) {
         const tokenSession = await getSession({ token });
-        console.log("Session in DB:", tokenSession);
 
         if (tokenSession?._id) {
           const user = await getUserByEmail(decoded.email);
-          console.log("Fetched user:", user?.email);
-          console.log("User status:", user?.status);
 
           if (user?._id && user.status === "active") {
             req.userInfo = user;
-            console.log("✅ Auth Passed, calling next()");
             return next();
-          } else {
-            console.log("❌ User not active or not found");
           }
-        } else {
-          console.log("❌ No session found in DB");
         }
-      } else {
-        console.log("❌ No email in decoded token");
       }
 
       message = decoded === "jwt expired" ? decoded : "Unauthorized";
-    } else {
-      console.log("❌ No Authorization header");
     }
-  } catch (err) {
-    console.error("🔥 Middleware error:", err);
+  } catch {
     message = "Server error";
   }
 
-  console.log("🚨 Sending 401 from middleware");
   responseClient({ req, res, message, statusCode: 401 });
 };
 

@@ -3,7 +3,6 @@ import Order from "../models/Order/OrderSchema.js";
 
 //this order for users
 export const fetchOrderHistory = async (req, res) => {
-  console.log("📌 Entered fetchOrderHistory with userInfo:", req.userInfo);
   try {
     const { _id: userId, isGuest, guestId } = req.userInfo;
     const query = isGuest
@@ -11,7 +10,7 @@ export const fetchOrderHistory = async (req, res) => {
       : { buyer: userId };
 
     const orders = await Order.find(query)
-      .populate("items.productId", "title imageUrl price")
+      .populate("items.productId", "title thumbnail price")
       .sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
