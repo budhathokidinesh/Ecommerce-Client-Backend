@@ -1,8 +1,9 @@
+//This is for the user activation link
 export const userActivationUrlEmailTemplate = ({ email, name, url }) => {
   return {
-    from: `"Ecommerce website" <${process.env.SMTP_EMAIL}>`, //Sender address
-    to: email, // List of recipients
-    subject: "Action required : Activate your new account", // Subject line
+    from: '"Ecommerce website" <physmarika@gmail.com>',
+    to: email,
+    subject: "Action required : Activate your new account",
     text: `Hello.. ${name},\n\nPlease activate your account by clicking the link below:\n${url}\n\nThank you!`, // Plain text body
     html: `<p>Hello ${name},</p>
         <p>Your account has been created. Please activate your account by clicking the link below:</p>
@@ -14,14 +15,16 @@ export const userActivationUrlEmailTemplate = ({ email, name, url }) => {
         <br>
         </a>
         <p>Thank you!</p>  
-        <p>Regards</p>`, // HTML body
+        <p>Regards</p>`,
   };
 };
+
+//This is for the notification email. Your account is activated
 export const userAccountActivatedNotificationTemplate = ({ email, name }) => {
   return {
-    from: `"Ecommerce website" <${process.env.SMTP_EMAIL}>`, //Sender address
-    to: email, // List of recipients
-    subject: "Account activated", // Subject line
+    from: '"Ecommerce website" <physmarika@gmail.com>',
+    to: email,
+    subject: "Account activated",
     text: `Hello.. ${name},\n\n, Your account has been activated. You may go and Sign in now.\n\nThank you!`, // Plain text body
     html: `<p>Hello ${name},</p>
        
@@ -32,26 +35,27 @@ export const userAccountActivatedNotificationTemplate = ({ email, name }) => {
         <br>
        
         <p>Thank you!</p>  
-        <p>Regards</p>`, // HTML body
+        <p>Regards</p>`,
   };
 };
 
+//This is for the reset password link email
 export const userResetPasswordLinkEmailTemplate = ({
   name,
   email,
   resetPasswordUrl,
 }) => {
   return {
-    from: `"Sportify Security Team" <${process.env.SMTP_EMAIL}>`,
+    from: '"Ecommerce website" <physmarika@gmail.com>',
     to: email,
-    subject: "Sportify - Password Reset Request",
+    subject: "Password Reset Request",
     html: `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Sportify Password Reset</title>
+          <title>Password Reset</title>
         </head>
         <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -63,7 +67,7 @@ export const userResetPasswordLinkEmailTemplate = ({
               <div style="color: #666666; font-size: 16px; line-height: 1.6;">
                 <p>Hello ${name},</p>
                 
-                <p>We received a request to reset your password for your Sportify account (${email}). To proceed with the password reset, please click the button below:</p>
+                <p>We received a request to reset your password for your Group Project account (${email}). To proceed with the password reset, please click the button below:</p>
                 
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${resetPasswordUrl}" 
@@ -83,14 +87,14 @@ export const userResetPasswordLinkEmailTemplate = ({
                 <p>If you did not request a password reset, please ignore this email or contact our support team if you have concerns.</p>
                 
                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eeeeee;">
-                  <p style="margin: 0;">Best regards,<br><strong>Sportify Security Team</strong></p>
+                  <p style="margin: 0;">Best regards,<br><strong>Group Project Security Team</strong></p>
                 </div>
               </div>
             </div>
             
             <div style="text-align: center; margin-top: 20px; color: #999999; font-size: 12px;">
               <p>This is an automated message, please do not reply to this email.</p>
-              <p>&copy; ${new Date().getFullYear()} Sportify. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} Group Project. All rights reserved.</p>
             </div>
           </div>
         </body>

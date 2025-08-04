@@ -4,6 +4,7 @@ import {
   getAllProductsByPath,
   getProductById,
   getProductsByCategoryId,
+  getProductBySlug,
 } from "../models/Product/ProductModel.js";
 // import { createRegexFilter } from "../utils/createRegexFilter.js";
 
@@ -69,7 +70,40 @@ export const getProductByIdController = async (req, res, next) => {
     next(error);
   }
 };
+export const getSingleProductsController = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
 
+    if (slug) {
+      // call model
+      const product = await getProductBySlug({ slug });
+      if (product?._id) {
+        return responseClient({
+          message: "here is the product",
+          res,
+          req,
+          payload: product,
+        });
+      } else {
+        return responseClient({
+          message: "no product found",
+          res,
+          req,
+          statusCode: 400,
+        });
+      }
+    } else {
+      return responseClient({
+        message: "you must send id",
+        res,
+        statusCode: 400,
+        req,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 export const getAllProductsController = async (req, res, next) => {
   try {
     // call model

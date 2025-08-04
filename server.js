@@ -1,6 +1,6 @@
 import express from "express";
 import { dbConnect } from "./src/config/dbconfig.js";
-
+import bodyParser from "body-parser";
 const app = express();
 const PORT = process.env.PORT || 8001;
 
@@ -26,25 +26,22 @@ import categoryRouter from "./src/routes/categoryRoutes.js";
 import orderRouter from "./src/routes/orderRoutes.js";
 import webhookRoute from "./src/routes/webhookRoute.js";
 import stripeRouter from "./src/routes/stripe.js";
-
-//API endpoints
-app.use("/api/v1/stripe/webhook", webhookRoute);
+import reviewRouter from "./src/routes/reviewRoutes.js";
 
 //for webhook
-app.use((req, res, next) => {
-  if (req.originalUrl.startsWith("/api/v1/webhook")) {
-    next(); // skip express.json() for webhook
-  } else {
-    express.json()(req, res, next);
-  }
-});
+app.use(
+  "/api/v1/stripe/webhook",
+  bodyParser.raw({ type: "*/*" }),
+  webhookRoute
+);
+app.use(express.json());
 //Auth Routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/payment", stripeRouter);
-// app.use(express.json());
+app.use("/api/v1/reviews", reviewRouter);
 
 //end poins for image
 app.use("/api/v1/all", imageRoutes);

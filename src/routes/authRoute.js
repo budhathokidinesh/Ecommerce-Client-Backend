@@ -19,11 +19,11 @@ import {
 } from "../middleware/authMiddleware.js";
 const router = express.Router();
 router.post("/register", newUserDataValidation, insertNewUser);
-router.post("/activate-user", userActivationDataValidation, activateUser);
+router.patch("/activate-user", userActivationDataValidation, activateUser);
 router.post("/login", loginDataValidation, loginUser);
 router.get("/user-info", userAuthMiddleware, getUser);
 router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.patch("/reset-password", resetPassword);
 router.post("/logout", userAuthMiddleware, logoutUser);
 router.get("/renew", renewAccessJWTMiddleware);
 

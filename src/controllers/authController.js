@@ -24,7 +24,7 @@ export const insertNewUser = async (req, res, next) => {
     //Receive the user Data
     const { password } = req.body;
     //Encrypt the password using bcrypt, before inserting into the database
-    req.body.password = hashpassword(password);
+    req.body.password = await hashpassword(password);
     //Create and send unique activation link to the user for email verification
 
     //Insert the user in the database
@@ -38,7 +38,7 @@ export const insertNewUser = async (req, res, next) => {
       });
       if (session?._id) {
         //Create url to send to client email for activation.
-        const url = `${process.env.ROOT_URL}/activate-user?sessionId=/${session._id}&t=${session.token}`;
+        const url = `${process.env.FRONTEND_URL}/activate-user?sessionId=${session._id}&token=${session.token}`;
         // Send this url to their email
         const emailId = await userActivationUrlEmail({
           email: user.email,
@@ -63,18 +63,19 @@ export const insertNewUser = async (req, res, next) => {
     next(error);
   }
 };
+//This is for activation the user
 export const activateUser = async (req, res, next) => {
   try {
-    const { sessionId, token: t } = req.body;
+    const { sessionId, token } = req.body;
     const session = await deleteSession({
       _id: sessionId,
-      token: t,
+      token,
     });
     if (session?._id) {
       //Update the user status to active
       const user = await updateUser(
         { email: session.association },
-        { status: "active" }
+        { status: "active", emailVerified: "true" }
       );
       if (user?._id) {
         //Send email notification to the user
@@ -214,7 +215,7 @@ export const forgotPassword = async (req, res) => {
         expiry: new Date(Date.now() + 3 * 60 * 60 * 1000), // Session expires in 3 hrs
       });
       if (newUserSession?._id) {
-        const resetPasswordUrl = `${process.env.ROOT_URL}/change-password?e=${user.email}&id=${secureId}`;
+        const resetPasswordUrl = `${process.env.FRONTEND_URL}/change-password?e=${user.email}&id=${secureId}`;
 
         //Send mail to user
         userResetPasswordEmail({

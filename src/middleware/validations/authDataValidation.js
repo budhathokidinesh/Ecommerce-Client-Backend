@@ -25,7 +25,7 @@ export const userActivationDataValidation = (req, res, next) => {
   // Create an object with the required fields(schema or rules)
   const obj = {
     sessionId: SESSION_REQUIRED,
-    t: TOKEN_REQUIRED,
+    token: TOKEN_REQUIRED,
   };
   validateData({ req, res, next, obj });
 };
