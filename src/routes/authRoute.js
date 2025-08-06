@@ -7,6 +7,8 @@ import {
   loginUser,
   logoutUser,
   resetPassword,
+  getWishlistProducts,
+  toggleWishlistController,
 } from "../controllers/authController.js";
 import {
   loginDataValidation,
@@ -25,6 +27,8 @@ router.get("/user-info", userAuthMiddleware, getUser);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
 router.post("/logout", userAuthMiddleware, logoutUser);
+router.post("/wishlist", userAuthMiddleware, toggleWishlistController);
+router.get("/wishlist", userAuthMiddleware, getWishlistProducts);
 router.get("/renew", renewAccessJWTMiddleware);
 
 export default router;

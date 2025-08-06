@@ -13,7 +13,7 @@ export const userAuthMiddleware = async (req, res, next) => {
 
   try {
     if (authorization) {
-      const token = authorization.startsWith("Bearer ")
+      const token = authorization.startsWith("Bearer")
         ? authorization.split(" ")[1]
         : authorization;
 

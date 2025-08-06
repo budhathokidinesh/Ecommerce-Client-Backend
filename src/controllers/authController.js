@@ -3,6 +3,7 @@ import {
   getUserByEmail,
   updateUser,
 } from "../models/User/UserModel.js";
+import UserSchema from "../models/User/UserSchema.js";
 import { comparePassword, hashpassword } from "../utils/bcrypt.js";
 import { v4 as uuidv4 } from "uuid";
 import { responseClient } from "../middleware/responseClient.js";
@@ -94,38 +95,7 @@ export const activateUser = async (req, res, next) => {
   }
 };
 
-// Login User
-// export const loginUser = async (req, res, next) => {
-//   try {
-//     //Destructure email and password from req.body
-//     const { email, password } = req.body;
-
-//     //Get user by email
-//     const user = await getUserByEmail(email);
-//     if (user?._id) {
-//       //Compare the password
-//       const isPassMatch = comparePassword(password, user.password);
-//       if (isPassMatch) {
-//         console.log("User authenticated succesfully...!");
-
-//         // Create JWTs, so that server can validate through these tokens, instead of asking for username and password
-//         const jwts = await getJwts(email);
-//         // Response jwts
-//         return responseClient({
-//           req,
-//           res,
-//           message: "Login successful...!",
-//           payload: jwts,
-//         });
-//       }
-//     }
-//     const message = " Invalid Login details !!";
-//     const statusCode = 401;
-//     responseClient({ req, res, message, statusCode });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+//This is for login user
 export const loginUser = async (req, res, next) => {
   try {
     //destructure user data
@@ -307,5 +277,80 @@ export const logoutUser = async (req, res) => {
         });
   } catch (error) {
     responseClient({ req, res, message: error.message, statusCode: 500 });
+  }
+};
+
+//This is for toggleWishListController
+export const toggleWishlistController = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const { productId } = req.body;
+    // const { user } = req.userInfo;
+
+    if (req.userInfo.wishList.includes(productId)) {
+      const obj = req.userInfo.wishList?.filter(
+        (list) => list.toString() !== productId.toString()
+      );
+      console.log(req.userInfo.wishList, "300");
+      console.log(obj, "301");
+      const user = await updateUser(
+        { _id: req.userInfo._id },
+        { $set: { wishList: obj } }
+      );
+
+      return responseClient({
+        req,
+        res,
+        message: "This product is aready in your wishlist",
+
+        payload: user.wishList,
+      });
+    } else {
+      const user = await updateUser(
+        { _id: req.userInfo._id },
+        { $set: { wishList: [...req.userInfo.wishList, productId] } }
+      );
+      console.log(user);
+      responseClient({
+        req,
+        res,
+        message: "This product is added to your wishlist",
+
+        payload: user.wishList,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+//This is for getting all wishlist products
+export const getWishlistProducts = async (req, res) => {
+  try {
+    const user = await UserSchema.findById(req.userInfo._id).populate(
+      "wishList"
+    );
+    if (!user) {
+      return responseClient({
+        req,
+        res,
+        statusCode: 404,
+        message: "User not found",
+      });
+    }
+    return responseClient({
+      req,
+      res,
+      statusCode: 200,
+      message: "Wishlist fetched",
+      payload: user.wishList,
+    });
+  } catch (error) {
+    responseClient({
+      req,
+      res,
+      statusCode: 500,
+      message: error.message || "Server error",
+    });
   }
 };
