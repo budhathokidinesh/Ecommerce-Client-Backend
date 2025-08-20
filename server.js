@@ -27,6 +27,7 @@ import orderRouter from "./src/routes/orderRoutes.js";
 import webhookRoute from "./src/routes/webhookRoute.js";
 import stripeRouter from "./src/routes/stripe.js";
 import reviewRouter from "./src/routes/reviewRoutes.js";
+import chatRouter from "./src/routes/chat.js";
 
 //for webhook
 app.use(
@@ -42,6 +43,7 @@ app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/payment", stripeRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/user", chatRouter);
 
 //end poins for image
 app.use("/api/v1/all", imageRoutes);

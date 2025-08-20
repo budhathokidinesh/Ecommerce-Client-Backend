@@ -29,7 +29,8 @@ const productSchema = new mongoose.Schema(
     },
     tags: [String],
 
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // References to reviews
+    // reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // References to reviews
+    reviews: { type: Number },
     videoUrl: { type: String },
   },
   { timestamps: true }

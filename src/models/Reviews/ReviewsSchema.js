@@ -18,11 +18,11 @@ const reviewSchema = new mongoose.Schema(
 
     comment: {
       type: String,
-      required: true,
+      required: false,
     },
-    reviewTitle: { type: String, required: true },
-    productFitting: { type: String, required: true },
-    productComforatability: { type: String, required: true },
+    reviewTitle: { type: String, required: false },
+    productFitting: { type: String, required: false },
+    productComforatability: { type: String, required: false },
   },
 
   { timestamps: true }
