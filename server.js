@@ -10,7 +10,8 @@ import morgan from "morgan";
 import { errorHandler } from "./src/middleware/errorHandler.js";
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      "http://dinesh-frontend-bucket.s3-website-ap-southeast-2.amazonaws.com/",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -55,7 +56,7 @@ dbConnect()
   .then(() => {
     /** ready to use. The `mongoose.connect()` promise resolves to mongoose
     instance. */
-    app.listen(PORT, (error) => {
+    app.listen(PORT, "0.0.0.0", (error) => {
       return !error
         ? console.log(`server is running at http://localhost:${PORT}`)
         : console.log(error);
