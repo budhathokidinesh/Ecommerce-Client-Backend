@@ -11,7 +11,7 @@ import { errorHandler } from "./src/middleware/errorHandler.js";
 app.use(
   cors({
     origin:
-      "http://dinesh-frontend-bucket.s3-website-ap-southeast-2.amazonaws.com/",
+      "http://dinesh-frontend-bucket.s3-website-ap-southeast-2.amazonaws.com",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })
