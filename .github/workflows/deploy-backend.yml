@@ -37,30 +37,33 @@ jobs:
           chmod 600 /tmp/ec2_key.pem
 
           # SSH and run commands on EC2
-          ssh -o StrictHostKeyChecking=no -i /tmp/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Stop and remove old container
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
+            # Stop and remove old container if exists
             docker stop ecommerce-backend || true
             docker rm ecommerce-backend || true
 
-            # Pull latest Docker image
+            # Pull the latest Docker image
             docker pull ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
 
-            # Run container
+            # Run container with all environment variables directly from GitHub secrets
             docker run -d -p 8001:8000 \
-              -e OPENAI_API_KEY=$OPENAI_API_KEY \
-              -e MONGO_URL=$MONGO_URL \
-              -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
-              -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
-              -e FRONTEND_URL=$FRONTEND_URL \
-              -e CLIENT_SECRET_KEY=$CLIENT_SECRET_KEY \
-              -e EMAIL_USER=$EMAIL_USER \
-              -e EMAIL_PASS=$EMAIL_PASS \
-              -e CLOUDE_NAME=$CLOUDE_NAME \
-              -e API_KEY=$API_KEY \
-              -e API_SECRET=$API_SECRET \
-              -e ACCESSJWT_SECRET=$ACCESSJWT_SECRET \
-              -e REFRESHJWT_SECRET=$REFRESHJWT_SECRET \
-              -e VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY \
+              -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
+              -e MONGO_URL='${{ secrets.MONGO_URL }}' \
+              -e STRIPE_SECRET_KEY='${{ secrets.STRIPE_SECRET_KEY }}' \
+              -e STRIPE_WEBHOOK_SECRET='${{ secrets.STRIPE_WEBHOOK_SECRET }}' \
+              -e FRONTEND_URL='${{ secrets.FRONTEND_URL }}' \
+              -e CLIENT_SECRET_KEY='${{ secrets.CLIENT_SECRET_KEY }}' \
+              -e EMAIL_USER='${{ secrets.EMAIL_USER }}' \
+              -e EMAIL_PASS='${{ secrets.EMAIL_PASS }}' \
+              -e CLOUDE_NAME='${{ secrets.CLOUDE_NAME }}' \
+              -e API_KEY='${{ secrets.API_KEY }}' \
+              -e API_SECRET='${{ secrets.API_SECRET }}' \
+              -e ACCESSJWT_SECRET='${{ secrets.ACCESSJWT_SECRET }}' \
+              -e REFRESHJWT_SECRET='${{ secrets.REFRESHJWT_SECRET }}' \
+              -e VITE_GEMINI_API_KEY='${{ secrets.VITE_GEMINI_API_KEY }}' \
               --name ecommerce-backend \
               ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
+
+            # Optional: Verify container is running
+            docker ps
           EOF
