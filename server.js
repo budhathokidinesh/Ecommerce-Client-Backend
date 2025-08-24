@@ -3,6 +3,7 @@ import { dbConnect } from "./src/config/dbconfig.js";
 import bodyParser from "body-parser";
 const app = express();
 const PORT = process.env.PORT || 8001;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 //Middlewares
 import cors from "cors";
@@ -10,8 +11,7 @@ import morgan from "morgan";
 import { errorHandler } from "./src/middleware/errorHandler.js";
 app.use(
   cors({
-    origin:
-      "http://dinesh-frontend-bucket.s3-website-ap-southeast-2.amazonaws.com",
+    origin: FRONTEND_URL,
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })

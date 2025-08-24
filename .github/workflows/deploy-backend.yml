@@ -1,0 +1,58 @@
+name: CI/CD for Ecommerce Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Docker auth (GitHub Container Registry)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest .
+
+      # Push Docker image to GHCR
+      - name: Push Docker image
+        run: docker push ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker stop ecommerce-backend || true
+            docker rm ecommerce-backend || true
+            docker pull ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
+            docker run -d -p 8001:8000 \
+              -e MONGO_URL=${{ secrets.MONGO_URL }} \
+              -e STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }} \
+              -e STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }} \
+              -e FRONTEND_URL=${{ secrets.FRONTEND_URL }} \
+              -e CLIENT_SECRET_KEY=${{ secrets.CLIENT_SECRET_KEY }} \
+              -e EMAIL_USER=${{ secrets.EMAIL_USER }} \
+              -e EMAIL_PASS=${{ secrets.EMAIL_PASS }} \
+              -e CLOUDE_NAME=${{ secrets.CLOUDE_NAME }} \
+              -e API_KEY=${{ secrets.API_KEY }} \
+              -e API_SECRET=${{ secrets.API_SECRET }} \
+              -e ACCESSJWT_SECRET=${{ secrets.ACCESSJWT_SECRET }} \
+              -e REFRESHJWT_SECRET=${{ secrets.REFRESHJWT_SECRET }} \
+              -e VITE_GEMINI_API_KEY=${{ secrets.VITE_GEMINI_API_KEY }} \
+              --name ecommerce-backend \
+              ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
