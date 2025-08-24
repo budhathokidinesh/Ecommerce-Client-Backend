@@ -23,11 +23,11 @@ jobs:
 
       # Build Docker image
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest .
+        run: docker build -t ghcr.io/budhathokidinesh/ecommerce-client-backend:latest .
 
       # Push Docker image to GHCR
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
+        run: docker push ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
 
       # Deploy to EC2
       - name: Deploy to EC2
@@ -39,7 +39,7 @@ jobs:
           script: |
             docker stop ecommerce-backend || true
             docker rm ecommerce-backend || true
-            docker pull ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
+            docker pull ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
             docker run -d -p 8001:8000 \
               -e MONGO_URL=${{ secrets.MONGO_URL }} \
               -e STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }} \
@@ -55,4 +55,4 @@ jobs:
               -e REFRESHJWT_SECRET=${{ secrets.REFRESHJWT_SECRET }} \
               -e VITE_GEMINI_API_KEY=${{ secrets.VITE_GEMINI_API_KEY }} \
               --name ecommerce-backend \
-              ghcr.io/${{ github.repository }}/ecommerce-client-backend:latest
+              ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
