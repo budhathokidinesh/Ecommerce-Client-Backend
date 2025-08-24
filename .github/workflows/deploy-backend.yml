@@ -23,7 +23,7 @@ jobs:
 
       # Build Docker image
       - name: Build Docker image
-        run: docker build -t ghcr.io/budhathokidinesh/ecommerce-client-backend:latest -f Dockerfile .
+        run: docker build -t ghcr.io/budhathokidinesh/ecommerce-client-backend:latest -f Ecommerce-Client-Backend/Dockerfile Ecommerce-Client-Backend
 
       # Push Docker image to GHCR
       - name: Push Docker image
