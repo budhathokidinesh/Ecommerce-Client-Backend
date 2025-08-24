@@ -46,7 +46,8 @@ jobs:
             docker pull ghcr.io/budhathokidinesh/ecommerce-client-backend:latest
 
             # Run container with all environment variables directly from GitHub secrets
-            docker run -d -p 8001:8000 \
+            docker run -d -p 8001:8001 \
+              -e PORT=8001 \
               -e OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
               -e MONGO_URL='${{ secrets.MONGO_URL }}' \
               -e STRIPE_SECRET_KEY='${{ secrets.STRIPE_SECRET_KEY }}' \
