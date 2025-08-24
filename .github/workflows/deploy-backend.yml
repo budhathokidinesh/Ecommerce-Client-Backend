@@ -15,11 +15,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Debug: List files to verify Dockerfile exists
-      - name: List files
-        run: ls -la
+      # Debug: Show exact file structure
+      - name: Debug - Verify files exist
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "=== Listing all files ==="
+          ls -la
+          echo "=== Checking for Dockerfile ==="
+          if [ -f "Dockerfile" ]; then
+            echo "✅ Dockerfile found!"
+            echo "=== Dockerfile content (first 10 lines) ==="
+            head -10 Dockerfile
+          else
+            echo "❌ Dockerfile NOT found!"
+            echo "=== Searching recursively ==="
+            find . -name "Dockerfile*" -type f
+            exit 1
+          fi
 
-      # Setup Docker auth (GitHub Container Registry)
+      # Setup Docker auth
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
