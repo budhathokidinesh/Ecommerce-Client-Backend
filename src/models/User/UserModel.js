@@ -13,3 +13,9 @@ export const getUserByEmail = (email) => {
 export const getOneUser = (filter) => {
   return UserSchema.findOne(filter);
 };
+export const getUserById = (userId) => {
+  return UserSchema.findById(userId);
+};
+export const findByIdAndDelete = (userId) => {
+  return UserSchema.findByIdAndDelete(userId);
+};

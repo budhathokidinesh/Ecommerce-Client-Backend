@@ -24,16 +24,19 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    viewedProducts: [],
     phone: {
       type: Number,
       trim: true,
     },
-    address: {
-      street: { type: String, trim: true },
-      city: { type: String, trim: true },
-      state: { type: String, trim: true },
-      country: { type: String, trim: true },
-    },
+    address: [
+      {
+        street: { type: String, trim: true },
+        city: { type: String, trim: true },
+        state: { type: String, trim: true },
+        country: { type: String, trim: true },
+      },
+    ],
     password: {
       type: String,
     },

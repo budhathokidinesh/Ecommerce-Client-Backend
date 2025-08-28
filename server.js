@@ -14,6 +14,7 @@ app.use(
     origin: FRONTEND_URL,
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 
@@ -29,6 +30,8 @@ import webhookRoute from "./src/routes/webhookRoute.js";
 import stripeRouter from "./src/routes/stripe.js";
 import reviewRouter from "./src/routes/reviewRoutes.js";
 import chatRouter from "./src/routes/chat.js";
+import recomendationRouter from "./src/routes/recomendationRoutes.js";
+import couponRouter from "./src/routes/couponRoutes.js";
 
 //for webhook
 app.use(
@@ -45,6 +48,8 @@ app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/payment", stripeRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/user", chatRouter);
+app.use("/api/v1/recomendation", recomendationRouter);
+app.use("/api/v1/coupons", couponRouter);
 
 //end poins for image
 app.use("/api/v1/all", imageRoutes);

@@ -6,6 +6,13 @@ const reviewSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    name: { type: String, required: true },
+    status: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "approved", "rejected"],
+    },
+
     productId: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",
@@ -18,11 +25,11 @@ const reviewSchema = new mongoose.Schema(
 
     comment: {
       type: String,
-      required: false,
+      required: true,
     },
-    reviewTitle: { type: String, required: false },
-    productFitting: { type: String, required: false },
-    productComforatability: { type: String, required: false },
+    reviewTitle: { type: String, required: true },
+    productFitting: { type: String, required: true },
+    productComforatability: { type: String, required: true },
   },
 
   { timestamps: true }

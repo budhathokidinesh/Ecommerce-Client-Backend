@@ -1,15 +1,35 @@
 import { responseClient } from "../middleware/responseClient.js";
+import { updateProductsRating } from "../models/Product/ProductModel.js";
 import {
-  getReviewById,
+  getReviewByProductId,
   postReview,
   updateReview,
 } from "../models/Reviews/ReviewsModel.js";
 
 export const postReviewController = async (req, res, next) => {
-  console.log(req.body);
-
   try {
     const review = await postReview(req.body);
+    if (review?._id) {
+      // update the product review
+
+      const totalreview = await getReviewByProductId({
+        productId: review?.productId,
+      });
+
+      if (Array.isArray(totalreview)) {
+        const averageRating =
+          totalreview.reduce((acc, item) => acc + item.rating, 0) /
+          totalreview.length;
+        const rating = parseFloat(averageRating.toFixed(1));
+        const product = await updateProductsRating(
+          { _id: review.productId },
+          { reviews: rating }
+        );
+        if (!product?._id) {
+          throw new Error("could not update the product rating");
+        }
+      }
+    }
 
     review?._id
       ? responseClient({
@@ -29,9 +49,14 @@ export const postReviewController = async (req, res, next) => {
   }
 };
 export const getProductReviewController = async (req, res, next) => {
+  console.log(req.params);
+  console.log(req.params.productId);
   try {
-    console.log(req.params, "ll");
-    const productReviewList = await getReviewById(req.params);
+    const productReviewList = await getReviewByProductId({
+      productId: req.params.productId,
+      status: "approved",
+    });
+
     return Array.isArray(productReviewList) && productReviewList.length
       ? responseClient({
           req,

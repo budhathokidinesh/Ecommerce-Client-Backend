@@ -1,6 +1,4 @@
 import express from "express";
-import multer from "multer";
-
 import ExpressFormidable from "express-formidable";
 import { imageUploadController } from "../controllers/imageUpload.js";
 
